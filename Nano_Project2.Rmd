@@ -1,0 +1,174 @@
+---
+title: "Nano_Project"
+output:
+  pdf_document: default
+  html_document: default
+  word_document: default
+date: "2023-07-25"
+---
+
+
+```{r Histogram}
+#Presentation 1
+# Gene: APOA-I
+# Continuous covariate : Age
+# 2 categorical covariates: (1) mechanical ventilation and (2) sex
+
+#Presentation 2
+# additional continuous covariate: charlson_score
+# 2 additional categorical covariates: gene2 and gene3 
+
+library(readr)
+Final <- read_csv("Final_data.csv")
+#Final <- read_csv("Documents/QBS courses/QBS 103 R/Project/CSV Excel Data/Final_data.csv")
+
+#Let's install all packages:
+install.packages("ggtext")
+install.packages("tidyverse")
+library(tidyverse)
+library(ggplot2)
+library(ggtext)
+
+Final %>%
+ggplot(aes(x = APOAI)) +
+geom_histogram(binwidth = 0.08, color = "black", fill = "grey") + 
+theme_bw()+
+labs(x = "*APOAI* Gene expression",
+y = "Number of Patients",
+title = "*APOAI* Distribution Among COVID-19 Patients") + theme(axis.title.x = ggtext::element_markdown()) + theme(plot.title = element_text(hjust = 0.5, face = "bold")) + theme(plot.title = ggtext::element_markdown())
+```
+
+
+
+```{r Scatter plot}
+#install.packages('ggpubr')
+library(ggpubr)
+
+ggpubr::ggscatter(Final,x = 'age',y = 'APOAI', ylab = "*APOAI* Gene Expression", xlab = "Age", main = "Age and *APOAI* Expression") + theme(axis.title.x = ggtext::element_markdown()) + theme(plot.title = element_text(hjust = 0.5, face = "bold")) + theme(plot.title = ggtext::element_markdown()) + theme(axis.title.y = ggtext::element_markdown())
+
+```
+```{r Box plot}
+
+ggpubr::ggboxplot(Final,x = 'mechanical_ventilation',y = 'APOAI',xlab = 'Mechanical Ventilation', ylab = '*APOAI* Expression', color = 'sex', main = "Mechanical Ventilation and *APOAI* Expression", subtitle = "(one subject was removed due to missingness)") + theme(axis.title.x = ggtext::element_markdown()) + theme(plot.title = element_text(hjust = 0.5, face = "bold")) + theme(plot.title = ggtext::element_markdown()) + theme(axis.title.y = ggtext::element_markdown()) + theme(plot.subtitle = element_text(hjust = 0.5))
+
+
+```
+
+```{r Function}
+
+
+apoai_express <- function(Final, var, gene){
+  
+  #histogram
+  Final %>%
+ggplot(aes(x = APOAI)) +
+geom_histogram(binwidth = 0.08, color = "black", fill = "grey") + 
+theme_bw()+
+labs(x = "*APOAI* Gene expression",
+y = "Number of Patients",
+title = "*APOAI* Distribution Among COVID-19 Patients") + theme(axis.title.x = ggtext::element_markdown()) + theme(plot.title = element_text(hjust = 0.5, face = "bold")) + theme(plot.title = ggtext::element_markdown())
+  
+  #scatterplot
+  ggpubr::ggscatter(Final,x = 'age',y = 'APOAI', ylab = "*APOAI* Gene Expression", xlab = "Age", main = "Age and *APOAI* Expression") + theme(axis.title.x = ggtext::element_markdown()) + theme(plot.title = element_text(hjust = 0.5, face = "bold")) + theme(plot.title = ggtext::element_markdown()) + theme(axis.title.y = ggtext::element_markdown())
+
+  #boxplot
+  ggpubr::ggboxplot(Final,x = 'mechanical_ventilation',y = 'APOAI',xlab = 'Mechanical Ventilation', ylab = '*APOAI* Expression', color = 'sex', main = "Mechanical Ventilation and *APOAI* Expression", subtitle = "(one subject was removed due to missingness)") + theme(axis.title.x = ggtext::element_markdown()) + theme(plot.title = element_text(hjust = 0.5, face = "bold")) + theme(plot.title = ggtext::element_markdown()) + theme(axis.title.y = ggtext::element_markdown()) + theme(plot.subtitle = element_text(hjust = 0.5))
+
+}
+
+#Step 2
+
+for (var in Final) {
+  print(apoai_express())
+   
+}
+
+#test
+apoai_express(Final,'charlson_score','APOAI')
+apoai_express(Final,'charlson_score','APOA2')
+apoai_express(Final,'charlson_score','APOAM')
+
+
+
+```
+
+
+
+
+
+
+
+```{r Function}
+
+#Name of the dataframe = apoai_express
+
+
+# Gene: APOA-I
+# Continuous covariate : Age
+# 2 categorical covariates: (1) mechanical ventilation and (2) sex
+# additional continuous covariate: charlson_score
+# 2 additional categorical covariates: gene2 and gene3 
+
+Final <- read_csv("CSV Excel Data/Final_data.csv")
+
+#First, let's create the function 
+library(ggplot2)
+
+
+apoai_express <- function(df, var, gene){
+  ggpubr::ggscatter(df,x = var, y = gene, ylab = "APOAI Gene Expression", xlab = "Age", main = "Age and APOAI Expression")
+  
+ggpubr::ggboxplot(df,x = 'mechanical_ventilation',y = 'APOAI',xlab = 'Mechanical Ventilation',
+                  ylab = 'APOAI Expression', color = 'sex')
+  df %>%
+  ggplot(aes(x = APOAI)) +
+  geom_histogram(binwidth = 0.7, fill = "#97B3C6") + 
+  theme_bw()+
+  labs(x = "APOAI Gene expression",
+       y = NULL,
+       title = "Hisogram of total APOAI gene expression")
+}
+
+#Step 2
+
+for (var in Final) {
+  apoai_express()
+   
+}
+apoai_express(Final,charlson_score,APOAI)
+apoai_express(Final,charlson_score,APOAI2)
+apoai_express(Final,charlson_score,APOAIM)
+
+
+View(Final)
+# fontface = "italic"
+# remove unknown from boxplot
+# 
+
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{Testing}
+
+data <- data.frame(x = runif(10), y = runif(10))
+
+library(ggplot2)
+ggplot() +
+  geom_point(data, mapping = aes(x, y)) +
+  ggtitle(expression(atop(paste(bold("Bold "), italic(" italic"),
+    underline(" underline"), 
+    underline(bold(" underline can go with bold")), 
+    underline(italic(" or italic"))),
+    paste(bolditalic(" - and italic & bold together"),
+    underline(bolditalic(" - and all together"))))))
+
+```
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
