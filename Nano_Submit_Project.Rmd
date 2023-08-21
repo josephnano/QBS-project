@@ -1,0 +1,160 @@
+---
+title: "Nano_Submit_Project"
+output: html_document
+date: "2023-08-19"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r}
+Final <- read.csv("Final.csv")
+
+library(tidyverse)
+library(ggplot2)
+library(ggtext)
+library(ggpubr)
+```
+
+
+## Scatterplot
+
+```{r}
+#install.packages('ggpubr')
+library(ggpubr)
+
+
+ggpubr::ggscatter(Final,x = 'age',y = 'APOAI', ylab = "*APOAI* Gene Expression", xlab = "Age", main = "Age and *APOAI* Expression") + theme(axis.title.x = ggtext::element_markdown()) + theme(plot.title = element_text(hjust = 0.5, face = "bold")) + theme(plot.title = ggtext::element_markdown()) + theme(axis.title.y = ggtext::element_markdown())
+```
+
+
+## Boxplot
+
+```{r}
+ggpubr::ggboxplot(Final,x = 'mechanical_ventilation',y = 'APOAI',xlab = 'Mechanical Ventilation (MV)', ylab = '*APOAI* Expression', color = 'sex', main = "Mechanical Ventilation and *APOAI* Expression", subtitle = "(one subject was removed due to missingness)") + theme(axis.title.x = ggtext::element_markdown()) + theme(plot.title = element_text(hjust = 0.5, face = "bold")) + theme(plot.title = ggtext::element_markdown()) + theme(axis.title.y = ggtext::element_markdown()) + theme(plot.subtitle = element_text(hjust = 0.5))
+
+```
+
+## Histogram
+
+```{r}
+Final %>%
+ggplot(aes(x = APOAI)) +
+geom_histogram(binwidth = 0.08, color = "black", fill = "grey") + 
+theme_bw()+
+labs(x = "*APOAI* Gene Expression",
+y = "Number of Patients",
+title = "*APOAI* Distribution Among COVID-19 Patients") + theme(axis.title.x = ggtext::element_markdown()) + theme(plot.title = element_text(hjust = 0.5, face = "bold")) + theme(plot.title = ggtext::element_markdown())
+
+```
+
+## Heatmap (was not knitted successfully)
+
+```{r}
+#Code source: DataAnalyticsIII lecture
+
+#geneExpression <- read.csv("geneExpression.csv")
+#view(geneExpression)
+
+#log2.geneExpression <- log2(geneExpression)
+
+#pheatmap(log2.geneExpression[1:10,1:10], cluster_rows = T, cluster_cols = T)
+
+#annotationColors <- list(Status = c('Yes' = 'aquamarine4','No' = 'deepskyblue4'))
+
+# Generate heatmap
+#pheatmap(log2.geneExpression[1:10,1:10],
+#         clustering_distance_cols = 'euclidean',
+#         clustering_distance_rows = 'euclidean',
+#         annotation_col = 'mechanical_ventilation',
+#         annotation_colors = annotationColors)
+
+```
+
+
+
+
+## Note: this ggplot was not used because it was not really informative but this is a new plot (not discussed in class)
+
+
+```{r}
+
+#dotplot
+
+
+Final %>%
+ggplot(aes(x = APOAI)) + geom_dotplot() + theme_bw()+
+labs(x = "*APOAI* Gene Expression",
+y = "Number of Patients",
+title = "*APOAI* Distribution Among COVID-19 Patients") + theme(axis.title.x = ggtext::element_markdown()) + theme(plot.title = element_text(hjust = 0.5, face = "bold")) + theme(plot.title = ggtext::element_markdown())
+
+```
+
+## New Plot: violin plot was not discussed in class and is helpful
+
+
+```{r}
+library(ggplot2)
+ggplot(Final, aes(x=mechanical_ventilation, y=APOAI)) + geom_violin() +
+  labs(y = "*APOAI* Gene Expression",
+       x = "Mechanical Ventilation (MV)",
+       title = "*APOAI* Gene Expression and Mechanical Ventilation",
+       subtitle = "(one subject was removed due to missingness)") + 
+  theme(axis.title.x = ggtext::element_markdown()) + 
+  theme(plot.title = element_text(hjust = 0.5, face = "bold")) + 
+  theme(plot.title = ggtext::element_markdown()) + 
+  theme(axis.title.y = ggtext::element_markdown()) + 
+  theme(plot.subtitle = element_text(hjust = 0.5))
+
+```
+
+
+## Table of summary 
+
+
+```{r}
+
+library(tidyverse)
+#install.packages('gtsummary')
+library(gtsummary)
+
+#view(Final)
+#head(Final)
+
+Final %>%
+  select(APOAI, age, sex,mechanical_ventilation,fibrinogen,charlson_score,
+         icu_status,lactate,ferritin,procalcitonin,disease_status) %>%
+  tbl_summary(
+    by = mechanical_ventilation,
+    label = list(sex = "Sex", age = "Age",fibrinogen = "Fibrinogen (mg/dL)",
+                 charlson_score = "Charlson score", icu_status = "ICU status",
+                 lactate = "Lactate (mmol/l)", ferritin = "Ferritin (ng/ml)",
+                 procalcitonin = "Procalcitonin (ng/ml)", 
+                 disease_status = "Disease status"),
+    statistic = list(
+      all_continuous() ~ "{mean} ({sd})",
+      all_categorical() ~ "{n} / {N} ({p}%)"
+    ), digits = all_continuous() ~ 2) %>%
+  add_p() %>% add_overall() %>%
+  modify_spanning_header(c("stat_1", "stat_2") ~ "**Mechanical Ventilation (MV)**"
+  ) %>%
+  modify_table_styling(
+    columns = label,
+    text_format = "bold",
+    undo_text_format = TRUE) %>%
+  bold_labels()
+
+```
+
+
+
+
+```{r}
+
+
+```
+
+
