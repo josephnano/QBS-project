@@ -1,0 +1,75 @@
+---
+title: "Nano_Project"
+output:
+  pdf_document: default
+  html_document: default
+  word_document: default
+date: "2023-07-25"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+
+# Gene: APOA-I
+# Continuous covariate : Age
+# 2 categorical covariates: (1) mechanical ventilation and (2) sex
+
+#First, let's upload and review both datasets
+
+Metadata <- read.csv("Documents/QBS courses/QBS 103 R/Project/QBS103_finalProject_metadata.csv")
+View(Metadata)
+
+geneExpression <- read.csv("Documents/QBS courses/QBS 103 R/Project/QBS103_finalProject_geneExpression.csv")
+View(geneExpression)
+
+# Let's combine both dataset
+
+Final <- read_csv("Desktop/Final_data.csv")
+
+#Let's install all packages:
+install.packages("tidyverse")
+library(tidyverse)
+
+# (1) Histogram (gene expression "APOAI")
+Final %>%
+  ggplot(aes(x = APOAI)) +
+  geom_histogram(binwidth = 0.7, fill = "#97B3C6") + 
+  theme_bw()+
+  labs(x = "APOAI Gene expression",
+       y = NULL,
+       tital = "Hisogram of total APOAI gene expression")
+
+  #Option 2
+hist(Final$APOAI, ylab = "Number of Patients", xlab = "APOAI Gene Expression", main = "APOAI Distribution Among COVID Patients")
+
+
+# (2) Scatterplot (Age v Gene Expression)
+install.packages('ggpubr')
+ggpubr::ggscatter(Final,x = 'age',y = 'APOAI', ylab = "APOAI Gene Expression", xlab = "Age", main = "Age and APOAI Expression")
+
+
+# (3) Boxplot (Gene expression by mechanical ventilation and sex)
+ggpubr::ggboxplot(Final,x = 'mechanical_ventilation',y = 'APOAI',xlab = 'Mechanical Ventilation',
+                  ylab = 'APOAI Expression', color = 'sex')
+
+
+
+# Explain why this gene? 
+
+#  Apolipoproteins, such as apolipoprotein E (apoE) are important components of lipoprotein particles.It attaches to cell membranes and promotes the movement of cholesterol and phospholipids from inside the cell to the outer surface. Also, it maintains normal lipid homeostasis in the lung. I'm choosing this gene because I predict that those who had severe COVID-19 symptoms and required the use of mechiancal ventilation, we more likely to have APOI expression impacted by the process.  
+
+  #Hypothesis: Patients who used mechanical ventilation at the hospital had lower APOI gene expression (down-regulation), which led to respitatory issues. 
+
+#Citation: https://medlineplus.gov/genetics/gene/apoa1/#:~:text=ApoA%2DI%20attaches%20to%20cell,apoA%2DI%20to%20form%20HDL.
+
+```
+
